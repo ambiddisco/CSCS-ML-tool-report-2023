@@ -1,12 +1,16 @@
+# Before running this code make sure you downloaded the requirements ("pip install tensorflow mlflow"), upgrade them
+# and run "mlflow server" in a terminal window. This will start the localhost server for visualisation and
+# model repository upload.
+
+
 import tensorflow as tf
 from tensorflow import keras
-from keras.datasets import mnist     
-from keras.models import Sequential  
-from keras.layers.core import Dense, Dropout, Activation 
-from keras.utils import np_utils 
+from keras.datasets import mnist
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Activation
+from keras.utils import np_utils
 import mlflow
-
-from mlflow import log_metric, log_params, log_artifacts
+from mlflow import log_params
 
 # Separating the MNIST classifier dataset into training and testing sets
 (X_train, y_train), (X_test, y_test) = keras.datasets.mnist.load_data()
@@ -21,7 +25,7 @@ first_layer_activation = ["relu", "sigmoid", "softmax", "relu", "sigmoid", "soft
 second_layer_nodes = [10, 15, 25, 25, 15, 10]
 second_layer_activation = ["sigmoid", "softmax", "relu", "relu", "sigmoid", "softmax"]
 
-# Setting up client and localhost
+# Setting up client and localhost. Remember to run "mlflow server" in a terminal.
 mlflow.set_tracking_uri("http://127.0.0.1:5000")
 client = mlflow.tracking.MlflowClient()
 
@@ -57,10 +61,7 @@ for i in range(6):
             loss = 'sparse_categorical_crossentropy',
             metrics = ['accuracy']
         )
-        history = model.fit(X_train_divided, y_train, epochs = 5, verbose = 1)
-        score = model.evaluate(X_test_divided, y_test)
+        model.fit(X_train_divided, y_train, epochs = 5, verbose = 1)
+        model.evaluate(X_test_divided, y_test)
 
-# MLflow will keep an open conection until it is terminated. I recommend just stopping the run
-# manually when you're done looking at your visualised information on the localhost connection,
-# but you can set the connection to close in your code with:
-# mlflow.end_run()
+# Once you're done, close the server with CTRL + C in the terminal
